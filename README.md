@@ -1,33 +1,31 @@
 
 # Typst Escape
 
-Это приложение для исполнения консольных команд изнутри Typst-документа. 
-Зачем? Я нахожу это полезным для, например, документирования библиотек, 
-написанных на других языках. 
-В частности, я планирую однажды добавить Typst Escape мануал, 
-написанный с помощью него же! Эх, если бы только Typst умел компилироваться в Markdown...
+This is an application for executing console commands from inside a Typst document.
+For what? I find this useful for, for example, documenting libraries 
+written in other languages.
+In particular, I plan to one day add a Typst Escape manual,
+written using it! Oh, if only Typst could compile to Markdown...
 
-!!! Это приложение невероятно опасно в использовании. 
-Убедитесь, что вы прочитали раздел `Safety`. 
-Автор не несёт ответственности за утеренные файлы при неосторожном использовании приложения !!!
+!!! This app is incredibly dangerous to use.
+Make sure you've read the `Safety` section.
+The author is not responsible for lost files due to careless use of the application!!!
 
-## Как это работает?
+## How does this work?
+You insert into the document in a special way configured metadata,
+marked with unique keys. 
+You also insert metadata with a list of these keys, marked `<typst-escape-keys>`.
 
-Вы вставляете в документ специальным образом (см. далее) сконфигурированную метаинформацию, 
-помеченную уникальными ключами. Также вы вставляете метаинформацию со списком этих ключей, 
-помеченную `<typst-escape-keys>`. 
+Then you launch the application, passing it the directory or file as parameter,
+it requests this meta-information from the document, executes the commands, 
+and then puts the output into files with the desired names.
 
-Затем вы запускаете приложение, передав ему в параметры нужную директорию или файл, 
-оно запрашивает у документа эту метаинформацию, исполняет команды, 
-а затем кладёт вывод в файлы с нужными именами. 
-
-Впрочем, есть также несколько Typst-функций, облегачающих работу.
-Приложение запишет их вам в нужный файл, если запустить его с `--init-lib <FILENAME>`.
-
+However, there are also several Typst functions that make your work easier.
+The application will write them to you in the required file if you run it with `--init-lib <FILENAME>`.
 
 ## Typst side
 
-### Простой пример
+### Simple example
 
 ```typ
 #escape(
@@ -47,39 +45,38 @@
 #finish-escape()
 ```
 
-Словарь `setup` описывает состояние рабочей директории до начала работы. 
-В данном случае --- это два текстовых файла в корне директории.
+The `setup` dictionary describes the state of the working directory before the work starts.
+In this case, these are two text files in the root of the directory.
 
-Затем идёт перечень команд. Каждая команда состоит из:
+Then there is a list of commands. Each team consists of:
 
-- Исполнителя и набора аргументов. В данном случае, `ls` с аргументом `-Ali`
-- Указания, в каком формате вернуть `stdout` команды
-- Указания, в каком формате вернуть `stderr` команды.
+- An executor and a set of arguments. In this case, `ls` with the argument `-Ali`
+- Indications in what format to return `stdout` commands
+- Indications in what format to return `stderr` commands.
 
-Последние два могут быть:
+The last two could be:
 
-- `none` (не возвращать)
-- `file-format("raw")` &mdash; блоком кода (опционально &mdash;)
-- `file-format("list")` &mdash; списком строк
+- `none` (do not return)
+- `file-format("raw")` &mdash; block of code
+- `file-format("list")` &mdash; list of strings
 - `file-format("conjoined-raw", color:"000000")` &mdash;
-строки `stdout` и `stderr`, составленные в порядке вывода (опционально раскрашенные, цвет в hex rgb без решётки) в качестве code line 
+  the `stdout` and `stderr` lines , composed in the output order (optionally colored, hex rgb color without hash) as code line
 - `file-format("conjoined-list")`&mdash;
-  строки `stdout` и `stderr`, составленные в порядке вывода и помеченные, из какого потока.
+  the `stdout` and `stderr` lines, composed in the output order and marked which stream they are from.
 
-Если для одного из потоков указан `"conjoined-raw"` или `"conjoined-list"`, для другого должен быть такой же.
+If `"conjoined-raw"` or `"conjoined-list"` is specified for one of the streams, the other must be the same.
 
-Наконец, `handler` &mdash; функция, которая строит контент из результата исполнения. 
-Подсказка: если вы не уверены, начните с `handler: it => [#it]` (по дефолту). 
-Вызов функции может сначала ругаться, что файла с результатами исполнения не существует, 
-но TypstEscape передаёт ключ, подавляющий эту ошибку, и если приложение работает в фоновом режиме, 
-ошибка быстро пропадёт.
+Finally, `handler` &mdash; a function that builds content from the execution result.
+Hint: if you are not sure, start with `handler: it => [#it]` (which is default).
+The function call may initially complain that the file with the execution results does not exist, 
+but TypstEscape passes a key that suppresses this error, 
+and if the application is running in the background, the error will quickly disappear.
 
-Наконец, в конце происходит вызов `finish-escape`, 
-который автоматически вставляет нужные для работы приложения ключи.
+Finally, at the end there is a call to `finish-escape`, which automatically inserts the keys necessary for the application to work.
 
-### Примеры вывода.
+### Output examples
 
-Для примера запустим код на Kotlin:
+For example, let's run the code in Kotlin:
 
 ```typ
 #import "escape.typ": *
@@ -156,7 +153,7 @@
 )
 ```
 
-Мы получим следующие результаты:
+We'll get the following results:
 
 ```typ
 (
@@ -218,34 +215,34 @@
 )
 ```
 
-Здесь `error` &mdash; `none`, `"forbidden"` или `"timeout"`. 
-Да, вы можете установить timeout для команды, передав ей соответствующий аргумент (в миллисекундах):
+Here `error` is either `none`, `"forbidden"` or `"timeout"`.
+Yes, you can set the timeout for a command by passing it as an argument (in milliseconds):
+
 ```typ
 command("gradle", "assemble", timeout:1000)
 ```
 
 ## Application side
 
-Запуск приложения прост: вам понадобится установленная Java:
+Running the application is simple: you will need Java installed.
 
 ```shell
 java -jar TypstEscape-0.1.jar FILE
 ```
 
-- Если `FILE` &mdash; директория, приложение будет искать `.typ` файлы в ней и обрабатывать по очереди
-- Если нет, приложение будет обрабатывать его независимо от расширения.
+- If `FILE` is a directory, the application will search for `.typ` files in it and process it one by one
+- Otherwise, the application will handle it as file regardless of the extension.
 
-По умолчанию приложение будет работать, в бесконечном цикле обрабатывая ваши файлы. 
-Вы можете поставить задержку между итерациями в миллисекундах: `--delay 1000`, 
-или указать обработать только один раз: `--once`.
+By default, the application will run in an endless loop processing your files.
+You can set a delay between iterations in milliseconds: `--delay 1000`, or specify to process only `--once`.
 
-Вы также можете потребовать создать файл со вспомогательными функциями (Файл будет отсчитываться от корня проекта):
+You can also request to create a file with helper functions (The file will be counted from the project root):
 
 ```shell
 java -jar TypstEscape-0.1.jar /path/to/your/project --init-lib escape.typ
 ```
 
-Или напечатать help message:
+Or print a help message:
 
 ```shell
 java -jar TypstEscape-0.1.jar --help
@@ -253,9 +250,9 @@ java -jar TypstEscape-0.1.jar --help
 
 ## Safety
 
-Это приложение невероятно опасно в использовании. 
+This app is incredibly dangerous to use.
 
-Вот такой (или аналогичный для Windows) код сотрёт вам домашнюю директорию, и скажет, что так и было.
+This code (or a similar one for Windows) will erase your entire home directory and tell you that it was so.
 
 ```typ
 #escape(
@@ -264,36 +261,36 @@ java -jar TypstEscape-0.1.jar --help
 )
 ```
 
-Для этого есть система валидации команд.
+There is a command validation system for this.
 
-- Во-первых, для каждой конкретной команды:
+- Firstly, for each specific command:
   
   ```shell
   java -jar TypstEscape-0.1.jar --allow gradle --ask java --forbid rm --forbid mv
   ```
-  
-  Таким образом, мы разрешаем запускаться команде `gradle`, 
-  команда `java` должна требовать подтверждения, команды `rm` и `mv` всегда запрещены.
-  
 
-- Во-вторых, для всех команд:
-  
-  - `--allow-all` --- разрешать все команды
-  - `--ask-each` --- спрашивать каждый раз
-  - `--forbid-all` --- запретить всё
-  
-  По умолчанию `--forbid-all`. 
-  
-  Частные указания имеют больший приоритет, чем общие. 
-  Если отдельная команда указана и как `--allow`, и как `--forbid`, поведение не определено!
-  
-## Установка
+  Thus, we allow the `gradle` command to run, 
+- the `java` command must require confirmation, 
+- the `rm` and `mv` commands are always prohibited.  
 
-Скомпилированный вместе с зависимостями jar лежит в корне репозитория.
+- Secondly, for all commands:
 
-## Сборка
+  - `--allow-all` --- allow all commands to run
+  - `--ask-each` --- ask every time
+  - `--forbid-all` --- forbid everything
 
-Вам понадобится gradle и две другие библиотеки:
+  `--forbid-all` is default. 
+  
+  Specific instructions take precedence over general instructions.
+  If a single command is specified as both `--allow` and `--forbid`, the behavior is undefined!
+
+## Installation
+
+The jar compiled along with its dependencies lies at the root of the repository.
+
+## Build
+
+You will need gradle and two other libraries:
 
 ```shell
 git clone https://github.com/LDemetrios/LDemetriosCommons.git

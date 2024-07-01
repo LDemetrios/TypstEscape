@@ -270,8 +270,8 @@ There is a command validation system for this.
   ```
 
   Thus, we allow the `gradle` command to run, 
-- the `java` command must require confirmation, 
-- the `rm` and `mv` commands are always prohibited.  
+  the `java` command must require confirmation, 
+  the `rm` and `mv` commands are always prohibited.  
 
 - Secondly, for all commands:
 

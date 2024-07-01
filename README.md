@@ -281,8 +281,8 @@ There is a command validation system for this.
 
   `--forbid-all` is default. 
   
-  Specific instructions take precedence over general instructions.
-  If a single command is specified as both `--allow` and `--forbid`, the behavior is undefined!
+Specific instructions take precedence over general instructions.
+If a single command is specified as both `--allow` and `--forbid`, the behavior is undefined!
 
 ## Installation
 

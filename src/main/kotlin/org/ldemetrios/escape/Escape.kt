@@ -27,7 +27,12 @@ fun process(typst: Typst, list: List<File>, validator: Validator, projectRoot: F
         println("File: ${file.relativeTo(projectRoot)}")
         try {
             val keys = typst
-                .query<TMetadata<TArray<TStr>>>(file.absolutePath, "typst-escape-keys", inputs = mapOf("typst-escape-working" to "true"))
+                .query<TMetadata<TArray<TStr>>>(
+                    file.absolutePath,
+                    "typst-escape-keys",
+                    inputs = mapOf("typst-escape-working" to "true"),
+                    root = args.root
+                )
                 .orElseThrow()
                 .singleOrNull()
                 .orElse { throw MalformedQuery("No value or multiple values by label <typst-escape-keys>") }
@@ -35,10 +40,15 @@ fun process(typst: Typst, list: List<File>, validator: Validator, projectRoot: F
 
             for (key in keys) {
                 val value = typst
-                    .query<TMetadata<TDictionary<TValue>>>(file.absolutePath, key, inputs = mapOf("typst-escape-working" to "true"))
+                    .query<TMetadata<TDictionary<TValue>>>(
+                        file.absolutePath,
+                        key,
+                        inputs = mapOf("typst-escape-working" to "true"),
+                        root = args.root
+                    )
                     .orElseThrow()
                     .singleOrNull()
-                    .orElse { throw RuntimeException("No value or multiple values by label <$key>") }
+                    .orElse { throw MalformedQuery("No value or multiple values by label <$key>") }
                     .value
 
                 val call = parseCall(file, projectRoot, value)
@@ -142,7 +152,9 @@ fun parseCall(requestingFile: File, projectRoot: File, value: TDictionary<TValue
         it.value as? TStr ?: throw MalformedQuery("All the values in the `setup` dictionary should be `str`s")
     }
 
-    val output = value.getAs<TStr>("output").value
+    val self = "/" + requestingFile.relativeTo(projectRoot).path
+
+    val output = value.getAs<TStr>("output").value.replace("\$self", self)
 
     val commands = value.getAs<TArray<*>>("commands").map {
         it as? TDictionary<*>
@@ -217,6 +229,6 @@ private fun streamSpec(
             }
         }
         val color = specDict.getAs<TStr>("color").value
-        StreamSpec(format,  color)
+        StreamSpec(format, color)
     }
 }

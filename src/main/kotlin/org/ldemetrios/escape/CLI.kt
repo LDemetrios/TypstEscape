@@ -34,7 +34,7 @@ const val typstSide = """
 ) = {
   escape-keys.display(key => {
     let file = if output-file == auto {
-      "test.typ" + str(key) + ".typesc"
+      "${"$"}self" + str(key) + ".typesc"
     } else {
       output-file
     }
@@ -186,6 +186,7 @@ fun main(args: Array<String>) = mainBody {
                 iter++
                 println("\n\n=== Iteration $iter\n\n")
                 process(typst, list, validator, root, this)
+                Thread.sleep(delay)
             }
         }
     }

@@ -291,6 +291,13 @@ There is a command validation system for this.
 Specific instructions take precedence over general instructions.
 If a single command is specified as both `--allow` and `--forbid`, the behavior is undefined!
 
+### Termination
+
+The app creates temporary files and deletes it after the command invocation. 
+Therefore, killing the process is not recommended. 
+Use `Ctrl+C` to send a `SIGINT` signal, and if the application is waiting for your answer, press enter. 
+The app will probably produce `InterruptedException` &mdash; that's ok.
+
 ## Installation
 
 The jar compiled along with its dependencies lies at the root of the repository.

@@ -79,12 +79,12 @@ const val typstSide = """
 """
 
 class Args(parser: ArgParser) {
-    val initLib by parser.storing(
+    val initLib by parser.flagging(
         "--init-lib",
-        help = "File to print the typst side of the application (defaults to null --- don't print). Relative to root (if ROOT is not a directory, relative to its dir)."
-    ).default(null)
+        help = "Print the typst side of the application (defaults to null --- don't print) to the FILE instead of running commands."
+    )
 
-    val root by parser.positional("ROOT", help = "The root directory or the file to work on.").default(null)
+    val root by parser.positional("FILE", help = "The root directory or the file to work on.")
 
     val delay by parser.storing(
         "-d", "--delay",
@@ -146,15 +146,12 @@ fun main(args: Array<String>) = mainBody {
         }
 
 
-        this.initLib.run { if (this == "null") null else this }?.let {
-            File(root, it).writeText(typstSide)
+        if (this.initLib) {
+            File(root).writeText(typstSide)
             return@run
         }
 
         val validator = Validator(this)
-        if(this.root == null) {
-            return@run println("No files provided")
-        }
         val list = this.root!!.let(::File).let {
             if (it.isFile) listOf(it) else it.walkTopDown().toList().filter { it.extension == "typ" }
         }

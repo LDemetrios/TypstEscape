@@ -25,7 +25,7 @@ it requests this meta-information from the document, executes the commands,
 and then puts the output into files with the desired names.
 
 However, there are also several Typst functions that make your work easier.
-The application will write them to you in the required file if you run it with `--init-lib <FILENAME>`.
+The application will write them to you in the required file if you run it with `--init-lib`.
 
 ## Typst side
 

@@ -7,9 +7,13 @@ written in other languages.
 In particular, I plan to one day add a Typst Escape manual,
 written using it! Oh, if only Typst could compile to Markdown...
 
+You can see an example of using TypstEscape for explaining how the code works here:
+https://github.com/LDemetrios/Programnomicon/tree/main/reinterpret_cast%20and%20java
+.
+
 !!! This app is incredibly dangerous to use.
 Make sure you've read the `Safety` section.
-The author is not responsible for lost files due to careless use of the application!!!
+The author is not responsible for losing files due to careless use of the application!!!
 
 ## How does this work?
 You insert into the document in a special way configured metadata,
@@ -29,6 +33,7 @@ The application will write them to you in the required file if you run it with `
 
 ```typ
 #escape(
+  current: "test.typ"
   setup: (
     "a.txt": "There's a text",
     "b.txt": ```
@@ -44,6 +49,8 @@ The application will write them to you in the required file if you run it with `
 
 #finish-escape()
 ```
+
+The `current` argument is a simple name of the file where the `escape` call is happening. 
 
 The `setup` dictionary describes the state of the working directory before the work starts.
 In this case, these are two text files in the root of the directory.

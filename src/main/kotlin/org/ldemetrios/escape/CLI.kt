@@ -13,6 +13,8 @@ enum class Safety {
 
 const val typstSide = """
 
+
+
 #let try-catch(lbl, key, try, catch) = locate(loc => {
   let path-label = label(lbl)
   let first-time = query(locate(_ => { }).func(), loc).len() == key
@@ -26,15 +28,17 @@ const val typstSide = """
 #let escape-keys = state("escape-keys", 0)
 
 #let escape(
+  current: none,
   setup: (:),
   ..commands,
   output-file: auto,
   handler: it => [#it],
   replacement: [`Missing information`],
 ) = {
+  assert(current != none or output-file != auto)
   escape-keys.display(key => {
     let file = if output-file == auto {
-      "${"$"}self" + str(key) + ".typesc"
+      current + str(key) + ".typesc"
     } else {
       output-file
     }
@@ -45,7 +49,7 @@ const val typstSide = """
         output: file,
       )) #label("typst-key-" + str(key))
     ]
-    if sys.inputs.at("typst-escape-working", default:"false") == "true" {
+    if sys.inputs.at("typst-escape-working", default: "false") == "true" {
       []
     } else {
       handler(eval(read(file)))
@@ -71,24 +75,6 @@ const val typstSide = """
   ) <typst-escape-keys>
 ])
 
-//// Example:
-//
-//#escape(
-//  setup: (
-//    "build.gradle.kts": build.text,
-//    "settings.gradle.kts": settings.text,
-//    "src/main/kotlin/Main.kt": code.text,
-//  ),
-//  command("gradle", "assemble"),
-//  command(
-//    ..("java", "-jar", "build/libs/untitled-1.0-SNAPSHOT.jar"),
-//    output: file-format("conjoined-raw"),
-//    error: file-format("conjoined-raw", color: "ff0000"),
-//  ),
-//  handler: it => it.at(1).output
-//)
-//
-//#finish-escape()
 
 """
 
